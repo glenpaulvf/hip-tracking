@@ -48,3 +48,18 @@ for m in methods:
     ## TM_SQDIFF passes
     ## TM_SQDIFF_NORMED passes
 
+# Template matching in video using TM_CCOEFF_NORMED
+video = cv2.VideoCapture('RyanRun.mp4')
+
+while(video.isOpened()):
+    ret, frame = video.read()
+    
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    cv2.imshow('frame', gray)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+    
+video.release()
+cv2.destroyAllWindows()
+cv2.waitKey(1) # Ensure that window is destroyed

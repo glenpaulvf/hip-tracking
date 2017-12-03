@@ -48,7 +48,7 @@ for m in methods:
     ## TM_SQDIFF passes
     ## TM_SQDIFF_NORMED passes
 
-# Template matching in video using TM_CCOEFF_NORMED
+# Template matching in video
 video = cv2.VideoCapture('RyanRun.mp4')
 
 while(video.isOpened()):
@@ -56,10 +56,29 @@ while(video.isOpened()):
     
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
+    # Template matching using TM_CCOEFF_NORMED
+    method = eval('cv2.TM_CCOEFF_NORMED')
+     
+    res = cv2.matchTemplate(gray, hip_tmpl, method)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    
+    top_left = max_loc
+    bottom_right = (top_left[0] + hip_tmpl_w, top_left[1] + hip_tmpl_h)
+    
+    cv2.rectangle(gray, top_left, bottom_right, 0, 2)
+        
     cv2.imshow('frame', gray)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     
 video.release()
 cv2.destroyAllWindows()
-cv2.waitKey(1) # Ensure that window is destroyed
+cv2.waitKey(1) # Ensure window is destroyed
+
+## Testing playback show which methods pass:
+## TM_CCOEFF n/a
+## TM_CCOEFF_NORMED passes, minor glitches before hip on desk, block
+## TM_CCORR n/a
+## TM_CCORR_NORMED fails, major glitches before, during hip on pants, desk
+## TM_SQDIFF fails, major glitches before, during hip on bag
+## TM_SQDIFF_NORMED fails, major glitches before, during hip on bag

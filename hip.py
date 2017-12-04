@@ -48,6 +48,7 @@ for m in methods:
     ## TM_SQDIFF passes
     ## TM_SQDIFF_NORMED passes
 
+
 # Template matching in video
 video = cv2.VideoCapture('RyanRun.mp4')
 
@@ -82,3 +83,38 @@ cv2.waitKey(1) # Ensure window is destroyed
 ## TM_CCORR_NORMED fails, major glitches before, during hip on pants, desk
 ## TM_SQDIFF fails, major glitches before, during hip on bag
 ## TM_SQDIFF_NORMED fails, major glitches before, during hip on bag
+
+
+# Template matching in video with initial grabbing
+video = cv2.VideoCapture('RyanRun.mp4')
+
+## Grab first 870 frames
+for f in range(0, 870):
+    video.grab()
+    
+## Retrieve next frames
+for f in range(0, 212): # Stop after frame 1082
+    ret, frame = video.retrieve()
+    
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    # Template matching using TM_CCOEFF_NORMED
+    method = eval('cv2.TM_CCOEFF_NORMED')
+     
+    res = cv2.matchTemplate(gray, hip_tmpl, method)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    
+    top_left = max_loc
+    bottom_right = (top_left[0] + hip_tmpl_w, top_left[1] + hip_tmpl_h)
+    
+    cv2.rectangle(gray, top_left, bottom_right, 0, 2)
+        
+    cv2.imshow('frame', gray)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+    
+    video.grab()
+    
+video.release()
+cv2.destroyAllWindows()
+cv2.waitKey(1) # Ensure window is destroyed

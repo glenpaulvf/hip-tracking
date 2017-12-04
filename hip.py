@@ -88,6 +88,9 @@ cv2.waitKey(1) # Ensure window is destroyed
 # Template matching in video with initial grabbing
 video = cv2.VideoCapture('RyanRun.mp4')
 
+## Store x, y coordinates of hip
+pos = []
+
 ## Grab first 870 frames
 for f in range(0, 870):
     video.grab()
@@ -105,6 +108,7 @@ for f in range(0, 212): # Stop after frame 1082
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
     
     top_left = max_loc
+    pos.append(top_left) # Store x, y coordinaes of hip
     bottom_right = (top_left[0] + hip_tmpl_w, top_left[1] + hip_tmpl_h)
     
     cv2.rectangle(gray, top_left, bottom_right, 0, 2)
@@ -118,3 +122,22 @@ for f in range(0, 212): # Stop after frame 1082
 video.release()
 cv2.destroyAllWindows()
 cv2.waitKey(1) # Ensure window is destroyed
+
+
+# Plot x, y coordinates of hip
+
+## Negate y-values
+pos = [(x, -y) for x, y in pos]
+
+## Decouple values
+pos = zip(*pos)
+
+## Plot
+plt.plot(pos[0], pos[1])
+plt.gca().set_xlim(0, 700)
+plt.gca().set_ylim(-65, -110)
+plt.gca().invert_yaxis() # Invert y-axis
+plt.title('Hip Trace')
+plt.xlabel('X Pixel')
+plt.ylabel('Y Pixel')
+plt.show()

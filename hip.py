@@ -130,7 +130,89 @@ cv2.waitKey(1) # Ensure window is destroyed
 ###############################################################################
 # Plot x, y coordinates of hip
 ###############################################################################
+# Negate y-values
+pos = [(x, -y) for x, y in pos]
 
+# Decouple values
+pos = zip(*pos)
+
+# Plot
+plt.plot(pos[0], pos[1])
+plt.gca().set_xlim(0, 700)
+plt.gca().set_ylim(-65, -110)
+plt.gca().invert_yaxis() # Invert y-axis
+plt.title('Hip Trace')
+plt.xlabel('X Pixel')
+plt.ylabel('Y Pixel')
+plt.show()
+
+###############################################################################
+# Improved template matching
+###############################################################################
+video = cv2.VideoCapture('RyanRun.mp4')
+
+# Store x, y coordinates of hip
+pos = []
+
+# Utilities
+init = True
+prev_tl = (0, 0)
+prev_br = (0, 0)
+
+# Grab first 870 frames
+for f in range(0, 871):
+    video.grab()
+    
+# Retrieve next frames
+for f in range(871, 1083): # Stop after frame 1082
+    ret, frame = video.retrieve()
+    
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    # Template matching using TM_CCOEFF_NORMED
+    method = eval('cv2.TM_CCOEFF_NORMED')
+    
+    # Template matching only near previous location
+    if init:
+        res = cv2.matchTemplate(gray, hip_tmpl, method)
+        init = False
+    else:
+        # Y values
+        top = prev_tl[1] - hip_tmpl_h
+        bottom = prev_br[1] + hip_tmpl_h
+        
+        # Zero outside search area
+        gray[:top, ] = 0
+        gray[bottom:, ] = 0
+        
+        res = cv2.matchTemplate(gray, hip_tmpl, method) # modified gray
+        
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    
+    top_left = max_loc
+    pos.append(top_left) # Store x, y coordinaes of hip
+    bottom_right = (top_left[0] + hip_tmpl_w, top_left[1] + hip_tmpl_h)
+    
+    prev_tl = top_left # Track top left location
+    prev_br = bottom_right # Track bottom right location
+    
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # restore gray
+    
+    cv2.rectangle(gray, top_left, bottom_right, 0, 2)
+        
+    cv2.imshow('frame', gray)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+    
+    video.grab()
+    
+video.release()
+cv2.destroyAllWindows()
+cv2.waitKey(1) # Ensure window is destroyed
+
+###############################################################################
+# Plot x, y coordinates of hip (improved template matching)
+###############################################################################
 # Negate y-values
 pos = [(x, -y) for x, y in pos]
 

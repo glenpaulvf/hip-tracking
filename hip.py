@@ -92,11 +92,11 @@ video = cv2.VideoCapture('RyanRun.mp4')
 pos = []
 
 ## Grab first 870 frames
-for f in range(0, 870):
+for f in range(0, 871):
     video.grab()
     
 ## Retrieve next frames
-for f in range(0, 212): # Stop after frame 1082
+for f in range(871, 1083): # Stop after frame 1082
     ret, frame = video.retrieve()
     
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

@@ -1,20 +1,22 @@
 import cv2
 from matplotlib import pyplot as plt
 
-
+###############################################################################
 # Comparison methods
+###############################################################################
 methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
            'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
 
-
+###############################################################################
 # Template matching in frame
+###############################################################################
 frame = cv2.imread('frame.png', cv2.IMREAD_GRAYSCALE)
 frame_copy = frame.copy()
 
 hip_tmpl = cv2.imread('hip.png', cv2.IMREAD_GRAYSCALE)
 hip_tmpl_w, hip_tmpl_h = hip_tmpl.shape[::-1]
 
-## Apply template matching per method
+# Apply template matching per method
 for m in methods:
     frame = frame_copy.copy()
     method = eval(m)
@@ -48,8 +50,9 @@ for m in methods:
     ## TM_SQDIFF passes
     ## TM_SQDIFF_NORMED passes
 
-
+###############################################################################
 # Template matching in video
+###############################################################################
 video = cv2.VideoCapture('RyanRun.mp4')
 
 while(video.isOpened()):
@@ -84,18 +87,19 @@ cv2.waitKey(1) # Ensure window is destroyed
 ## TM_SQDIFF fails, major glitches before, during hip on bag
 ## TM_SQDIFF_NORMED fails, major glitches before, during hip on bag
 
-
-# Template matching in video with initial grabbing
+###############################################################################
+# Template matching in video with grabbing and retrieving
+###############################################################################
 video = cv2.VideoCapture('RyanRun.mp4')
 
-## Store x, y coordinates of hip
+# Store x, y coordinates of hip
 pos = []
 
-## Grab first 870 frames
+# Grab first 870 frames
 for f in range(0, 871):
     video.grab()
     
-## Retrieve next frames
+# Retrieve next frames
 for f in range(871, 1083): # Stop after frame 1082
     ret, frame = video.retrieve()
     
@@ -123,16 +127,17 @@ video.release()
 cv2.destroyAllWindows()
 cv2.waitKey(1) # Ensure window is destroyed
 
-
+###############################################################################
 # Plot x, y coordinates of hip
+###############################################################################
 
-## Negate y-values
+# Negate y-values
 pos = [(x, -y) for x, y in pos]
 
-## Decouple values
+# Decouple values
 pos = zip(*pos)
 
-## Plot
+# Plot
 plt.plot(pos[0], pos[1])
 plt.gca().set_xlim(0, 700)
 plt.gca().set_ylim(-65, -110)
